@@ -17,7 +17,7 @@ type Manager struct {
 	clients      ClientList              // stores all connections
 	sync.RWMutex                         // needed for async safety
 	handlers     map[string]EventHandler // stores all supported EventHandlers for different types.
-	otps		RetentionMap			 // holds all valid OTPs (One-Time-Passwords)
+	otps         RetentionMap            // holds all valid OTPs (One-Time-Passwords)
 }
 
 // holds all the different Clients currently connected to that manager/websocket.
@@ -27,7 +27,7 @@ func NewManager(ctx context.Context) *Manager {
 	m := &Manager{
 		clients:  make(ClientList),
 		handlers: make(map[string]EventHandler),
-		otps:	  NewRetentionMap(ctx, 5*time.Second),
+		otps:     NewRetentionMap(ctx, 5*time.Second),
 	}
 	m.SetupEventHandlers()
 	return m

@@ -7,8 +7,6 @@ import (
 	"net/http"
 )
 
-
-
 func main() {
 	// root ctx and CancelFunc that can cancel RetentionMap goroutines:
 	rootCtx := context.Background()

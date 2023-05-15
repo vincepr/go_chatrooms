@@ -47,7 +47,7 @@ func (rm RetentionMap) VertifyOTP(otp string) bool {
 // Runs as a Goroutine (is blocking so async save)
 // makes sure old OTP tokens are removed when no longer valid
 func (rm RetentionMap) retention(ctx context.Context, duration time.Duration) {
-	ticker := time.NewTicker(500 * time.Millisecond)		//frequency we check
+	ticker := time.NewTicker(500 * time.Millisecond) //frequency we check
 	for {
 		select {
 		case <-ticker.C:

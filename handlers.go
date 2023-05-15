@@ -30,7 +30,7 @@ func (m *Manager) serveWS(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
-	
+
 	// Upgrade the HTTP request to a continous Websocket
 	log.Println("New connection upgrade request")
 	conn, err := websocketUpgrader.Upgrade(w, r, nil)
@@ -61,7 +61,7 @@ type response struct {
 func (m *Manager) loginHandler(w http.ResponseWriter, r *http.Request) {
 	// parse incoming JSON:
 	var req userLoginRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil{
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
