@@ -17,8 +17,6 @@ var (
 	msgMaxSize int64 = 512
 )
 
-
-
 // each Client gets a Client struct once upgraded to a Websocket Connection (from HTTP)
 type Client struct{
 	conn *websocket.Conn		// the websocket connection
