@@ -1,13 +1,13 @@
-if (!window["WebSocket"]){
-    alert("Not supporting websockets, change your browser.");
-}
-
+// initial selection for chat-room:
 var selectedChat = "general"
-var wsConn = new WebSocket("ws://"+ document.location.host + "/ws");
+// holds reference to the Websocketconnection once established:
+var wsConn = null;  
+
 
 // setup the onSubmit callbacks
-document.getElementById("form-selection").addEventListener("submit", handleRoomSelection)
-document.getElementById("form-message").addEventListener("submit", handleSendMessage)
+document.getElementById("form-selection").addEventListener("submit", handleRoomSelection);
+document.getElementById("form-message").addEventListener("submit", handleSendMessage);
+document.getElementById("form-login").addEventListener("submit", handleLogin);
 
 
 /*
@@ -32,6 +32,38 @@ function handleSendMessage(ev) {
     }
 }
 
+// handles the login request
+function handleLogin(ev) {
+    ev.preventDefault();
+    let formData = {
+        "username": document.getElementById("username").value,
+        "password": document.getElementById("password").value,
+    }
+    // send request to the /login api endpoint
+    fetch("login", {
+        method: "post",
+        body: JSON.stringify(formData),
+        mode: "cors",
+    }).then((response) => {
+        if(response.ok) return response.json();
+        else throw 'unauthorized';
+    }).then((data) => {
+        connectWebsocket(data.otp);
+    }).catch((err) => {alert(err)});
+}
+
+// handles (after successful login) opening the websocket.
+function connectWebsocket(oneTimePassword) {
+    // check if browser supports WebSocket
+    if (!window["WebSocket"]){
+        alert("Not supporting websockets, change your browser.");
+        return;
+    }
+
+    wsConn = new WebSocket("ws://"+ document.location.host + "/ws?otp="+oneTimePassword);
+    
+
+}
 
 /*
 *   Handlers for the Websocket events:
