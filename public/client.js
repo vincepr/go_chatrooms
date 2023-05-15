@@ -1,13 +1,15 @@
+
 // initial selection for chat-room:
 var selectedChat = "general"
+
 // holds reference to the Websocketconnection once established:
 var wsConn = null;  
-
 
 // setup the onSubmit callbacks
 document.getElementById("form-selection").addEventListener("submit", handleRoomSelection);
 document.getElementById("form-message").addEventListener("submit", handleSendMessage);
 document.getElementById("login").addEventListener("submit", handleLogin);
+
 
 /*
 *   Button/Submit Handlers:
@@ -63,6 +65,7 @@ function connectWebsocket(oneTimePassword) {
     setupWsHandlers();
 }
 
+
 /*
 *   Handlers for the Websocket events:
 */
@@ -97,6 +100,7 @@ function setupWsHandlers() {
 *   Event class is used to wrap all messages
 *   Go will be able to use the `same struct` to Deserialize it
 */
+
 class Event {
     constructor(type, payload) {
         this.type = type;
