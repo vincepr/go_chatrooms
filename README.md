@@ -42,6 +42,9 @@ In this case the Server is sending the pings. And if no Pong is received back it
 ## Authentification
 - happens before upgrading from http to a websocket connection.
 - 2 recommended solutions:
-    - a regular http request to authenticate returns a one-time-use password to connect
+    - a regular http request to authenticate returns a one-time-use (OTP) password to connect
     - connect a WebSocket but dont accept any messages untill a special Auth-message with credentials gets sent.
 
+
+A **RetentionMap** holds OTPs. They turn invalid after a few seconds.
+- to get them we hit the login endpoint.
