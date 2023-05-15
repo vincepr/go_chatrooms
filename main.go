@@ -7,8 +7,6 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-
-
 var (
 	// upgrades the incoming HTTP(S) request to a Websocket (or at least tries to)
 	websocketUpgrader = websocket.Upgrader{
@@ -30,7 +28,6 @@ func initAPI() {
 	http.Handle("/", http.FileServer(http.Dir("./public")))
 	http.HandleFunc("/ws", manager.serveWS)
 }
-
 
 // checkOrigin will check origin and return true if its allowed
 func checkOrigin(r *http.Request) bool {
