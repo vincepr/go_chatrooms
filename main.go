@@ -1,35 +1,37 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"log"
 	"net/http"
-
-	"github.com/gorilla/websocket"
 )
 
-var (
-	// upgrades the incoming HTTP(S) request to a Websocket (or at least tries to)
-	websocketUpgrader = websocket.Upgrader{
-		ReadBufferSize:  1024,
-		WriteBufferSize: 1024,
-		// to avoid Cross-Site Requests we can set a allowed origin:
-		CheckOrigin: checkOrigin,
-	}
-)
+
 
 func main() {
-	initAPI()
+	// root ctx and CancelFunc that can cancel RetentionMap goroutines:
+	rootCtx := context.Background()
+	ctx, cancel := context.WithCancel(rootCtx)
+	defer cancel()
+
+	initAPI(ctx)
 	log.Fatal(http.ListenAndServe(":5555", nil))
 }
 
-func initAPI() {
-	manager := NewManager()
+func initAPI(ctx context.Context) {
+	manager := NewManager(ctx)
 
 	http.Handle("/", http.FileServer(http.Dir("./public")))
+	http.HandleFunc("/login", manager.loginHandler)
 	http.HandleFunc("/ws", manager.serveWS)
+
+	http.HandleFunc("/debug", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, len(manager.clients))
+	})
 }
 
-// checkOrigin will check origin and return true if its allowed
+// used to filter out Cross-Site trafic if needed.
 func checkOrigin(r *http.Request) bool {
 	// Grab the request origin
 	origin := r.Header.Get("Origin")

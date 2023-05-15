@@ -17,7 +17,7 @@ type RetentionMap map[string]OTP
 
 func NewRetentionMap(ctx context.Context, duration time.Duration) RetentionMap {
 	rm := make(RetentionMap)
-	go rm.Retention(ctx, duration) // runs in background and removes expired OTPs
+	go rm.retention(ctx, duration) // runs in background and removes expired OTPs
 	return rm
 }
 
@@ -46,8 +46,8 @@ func (rm RetentionMap) VertifyOTP(otp string) bool {
 
 // Runs as a Goroutine (is blocking so async save)
 // makes sure old OTP tokens are removed when no longer valid
-func (rm RetentionMap) Retention(ctx context.Context, duration time.Duration) {
-	ticker := time.NewTicker(400 * time.Millisecond)
+func (rm RetentionMap) retention(ctx context.Context, duration time.Duration) {
+	ticker := time.NewTicker(500 * time.Millisecond)		//frequency we check
 	for {
 		select {
 		case <-ticker.C:

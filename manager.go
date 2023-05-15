@@ -1,11 +1,11 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
-	"log"
-	"net/http"
 	"sync"
+	"time"
 )
 
 var (
@@ -17,15 +17,17 @@ type Manager struct {
 	clients      ClientList              // stores all connections
 	sync.RWMutex                         // needed for async safety
 	handlers     map[string]EventHandler // stores all supported EventHandlers for different types.
+	otps		RetentionMap			 // holds all valid OTPs (One-Time-Passwords)
 }
 
 // holds all the different Clients currently connected to that manager/websocket.
 type ClientList map[*Client]bool
 
-func NewManager() *Manager {
+func NewManager(ctx context.Context) *Manager {
 	m := &Manager{
 		clients:  make(ClientList),
 		handlers: make(map[string]EventHandler),
+		otps:	  NewRetentionMap(ctx, 5*time.Second),
 	}
 	m.SetupEventHandlers()
 	return m
@@ -49,22 +51,6 @@ func (m *Manager) routeEvent(event Event, c *Client) error {
 	} else {
 		return ErrEventNotSupported
 	}
-}
-
-// the WebSocket HandleFunc
-func (m *Manager) serveWS(w http.ResponseWriter, r *http.Request) {
-
-	log.Println("New connection upgrade request")
-	conn, err := websocketUpgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Println("Failed WF Upgrade:", err)
-		return
-	}
-
-	client := NewClient(conn, m)
-	m.addClient(client)
-	go client.readMessages()
-	go client.writeMessages()
 }
 
 // add the newly connected client to our List of all current clients
