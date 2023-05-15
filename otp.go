@@ -13,25 +13,24 @@ import (
 )
 
 // holds all active/valid tokens
-type RetentionMap map[string] OTP
+type RetentionMap map[string]OTP
 
 func NewRetentionMap(ctx context.Context, duration time.Duration) RetentionMap {
 	rm := make(RetentionMap)
-	go rm.Retention(ctx, duration)	// runs in background and removes expired OTPs
+	go rm.Retention(ctx, duration) // runs in background and removes expired OTPs
 	return rm
 }
 
-
 // a single (valid) login token
 type OTP struct {
-	Key		string
-	Created	time.Time
+	Key     string
+	Created time.Time
 }
 
 func (rm RetentionMap) NewOTP() OTP {
 	otp := OTP{
-		Key: 		uuid.NewString(),
-		Created:	time.Now(),
+		Key:     uuid.NewString(),
+		Created: time.Now(),
 	}
 	rm[otp.Key] = otp
 	return otp
@@ -52,7 +51,7 @@ func (rm RetentionMap) Retention(ctx context.Context, duration time.Duration) {
 	for {
 		select {
 		case <-ticker.C:
-			for _, otp := range rm{
+			for _, otp := range rm {
 				if otp.Created.Add(duration).Before(time.Now()) {
 					delete(rm, otp.Key)
 				}
