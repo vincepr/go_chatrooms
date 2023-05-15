@@ -9,8 +9,21 @@
 </head>
 <body>
     <div class="center">
+        <!-- Login: -->
+        <div style="border: 3px solid black;margin-top: 30px;">
+            <form id="login-form">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username"/><br/>
+                <label for="password">Password</label>
+                <input type="text" id="password" name="password"/><br/><br/>
+                <input type="submit" value="Login"/>
+            </form>
+        </div>
+
         <h1>Go Chatroom Example</h1>
-        <h3 id=""chat-header>Currently in room: general</h3>
+        <h3 id="chat-header">Currently in room: general</h3>
+        <h3 id="connection-header">Logged in: false</h3>
+        
 
         <form id="form-selection">
             <label for="chatroom">Chatroom:</label>
@@ -28,6 +41,8 @@
             <input type="text" id="message" name="message"/><br/>
             <input type="submit" value="Send"/>
         </form>
+
+        
     </div>
     <script defer type="text/javascript" src="./client.js"></script> 
 </body>
