@@ -7,8 +7,7 @@ var wsConn = null;
 // setup the onSubmit callbacks
 document.getElementById("form-selection").addEventListener("submit", handleRoomSelection);
 document.getElementById("form-message").addEventListener("submit", handleSendMessage);
-document.getElementById("form-login").addEventListener("submit", handleLogin);
-
+document.getElementById("login").addEventListener("submit", handleLogin);
 
 /*
 *   Button/Submit Handlers:
@@ -48,6 +47,7 @@ function handleLogin(ev) {
         if(response.ok) return response.json();
         else throw 'unauthorized';
     }).then((data) => {
+        console.log("data:" + data)
         connectWebsocket(data.otp);
     }).catch((err) => {alert(err)});
 }
@@ -59,38 +59,37 @@ function connectWebsocket(oneTimePassword) {
         alert("Not supporting websockets, change your browser.");
         return;
     }
-
     wsConn = new WebSocket("ws://"+ document.location.host + "/ws?otp="+oneTimePassword);
-    
-
+    setupWsHandlers();
 }
 
 /*
 *   Handlers for the Websocket events:
 */
-
-// gets triggered after connection gets accepted by the server
-// wsConn.onopen = () => {
-//     console.log("connected to: "+ url);
-// }
-
-// gets triggered after the connection has closed
-wsConn.onclose = (ev) => {
-    console.log("connection close with: " + ev.code);
-}
-
-// gets triggered after receiving a message von the server
-wsConn.onmessage = (ev) => {
-    console.log(ev);
-    const eventData = JSON.parse(evt.data);
-    const event = Object.assign(new Event, eventData);
-    routeEvent(event);
-    console.log("message received: " + ev.data);
-}
-
-// gets triggered on errors
-wsConn.onerror = (ev) => {
-    console.log("error with the websocket: "+ ev)
+function setupWsHandlers() {
+    // gets triggered after connection gets accepted by the server
+    wsConn.onopen = () => {
+        document.getElementById("connection-header").innerHTML = "Logged in - active Websocket connection.";
+    }
+    
+    // gets triggered after the connection has closed
+    wsConn.onclose = (ev) => {
+        document.getElementById("connection-header").innerHTML = "Not Logged in - Websocket connection closed.";
+    }
+    
+    // gets triggered after receiving a message von the server
+    wsConn.onmessage = (ev) => {
+        console.log(ev);
+        const eventData = JSON.parse(evt.data);
+        const event = Object.assign(new Event, eventData);
+        routeEvent(event);
+        //console.log("message received: " + ev.data);
+    }
+    
+    // gets triggered on errors
+    wsConn.onerror = (ev) => {
+        console.log("error with the websocket: "+ ev)
+    }
 }
 
 
