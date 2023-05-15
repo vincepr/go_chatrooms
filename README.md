@@ -48,3 +48,6 @@ In this case the Server is sending the pings. And if no Pong is received back it
 
 A **RetentionMap** holds OTPs. They turn invalid after a few seconds.
 - to get them we hit the login endpoint.
+
+## Setting it up
+- User is hardcoded to `bob` and password to `123` at the moment.
