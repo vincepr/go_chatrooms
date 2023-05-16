@@ -1,3 +1,7 @@
+/*		Manager controlls all Client that connect trough Websockets
+*		We store our client list here that we savely async read write to etc.
+ */
+
 package main
 
 import (

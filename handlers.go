@@ -1,3 +1,7 @@
+/*
+*		Handlers for different API Routes like "/login" "/ws"
+ */
+
 package main
 
 import (
@@ -17,6 +21,21 @@ var (
 		CheckOrigin: checkOrigin,
 	}
 )
+
+// used to filter out Cross-Site traffic if needed.
+func checkOrigin(r *http.Request) bool {
+	// Grab the request origin
+	origin := r.Header.Get("Origin")
+
+	switch origin {
+	case "http://localhost:8080":
+		return true
+	case "http://vprobst.de:5555":
+		return true
+	default:
+		return false
+	}
+}
 
 // the WebSocket HandleFunc - websockets traffic at "/ws"
 func (m *Manager) serveWS(w http.ResponseWriter, r *http.Request) {

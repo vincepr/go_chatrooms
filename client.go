@@ -1,3 +1,7 @@
+/*		For every open WebSocket connection one Client gets created
+*		both it's readMessages() and writeMessages() run as independent goroutines
+ */
+
 package main
 
 import (
@@ -105,9 +109,8 @@ func (c *Client) writeMessages() {
 				log.Println("Failed Writing to Channel:", err)
 			}
 			log.Println("dbg: sent message sucessfully")
-		// time send next ping, checking if connection is still alive
+		// send a ping, to checki if connection is still alive
 		case <-ticker.C:
-			// log.Println("sending ping")
 			if err := c.conn.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
 				log.Println("no pong recieved in time: ", err)
 				return // got no pong back in time -> we close
@@ -118,7 +121,6 @@ func (c *Client) writeMessages() {
 
 // handle the received Pong Message Type from the client
 func (c *Client) pongHandler(pongMsg string) error {
-	// log.Println("pong")
-	// setup next Ping:
+	// pong came back. setup next Ping in timeline:
 	return c.conn.SetReadDeadline(time.Now().Add(pongWait))
 }

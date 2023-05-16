@@ -1,6 +1,5 @@
-/*
-*	Basic One Time Password - OTP solution for Authentification
-*	happens before Websocket connection is established
+/*		Basic One Time Password - OTP solution for Authentification
+*		happens before Websocket connection is established
  */
 
 package main

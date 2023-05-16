@@ -1,3 +1,7 @@
+/*
+*		Main entry point for the server.
+ */
+
 package main
 
 import (
@@ -8,7 +12,7 @@ import (
 )
 
 func main() {
-	// root ctx and CancelFunc that can cancel RetentionMap goroutines:
+	// root context and CancelFunc can cancel RetentionMap goroutines:
 	rootCtx := context.Background()
 	ctx, cancel := context.WithCancel(rootCtx)
 	defer cancel()
@@ -17,6 +21,7 @@ func main() {
 	log.Fatal(http.ListenAndServe(":5555", nil))
 }
 
+// setup the Routes and our Manager-struct controlling the Websockets
 func initAPI(ctx context.Context) {
 	manager := NewManager(ctx)
 
@@ -27,19 +32,4 @@ func initAPI(ctx context.Context) {
 	http.HandleFunc("/debug", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, len(manager.clients))
 	})
-}
-
-// used to filter out Cross-Site trafic if needed.
-func checkOrigin(r *http.Request) bool {
-	// Grab the request origin
-	origin := r.Header.Get("Origin")
-
-	switch origin {
-	case "http://localhost:8080":
-		return true
-	case "http://vprobst.de:5555":
-		return true
-	default:
-		return false
-	}
 }

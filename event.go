@@ -1,3 +1,7 @@
+/*		Here we define all Types our Socket-Api Supports
+*		(ex. Messages, Broadcasts, ChangeRoom)
+ */
+
 package main
 
 import (
@@ -5,10 +9,6 @@ import (
 	"fmt"
 	"time"
 )
-
-/*
-*		Here we define all Types our Socket-Api Supports (ex. Messages, Broadcasts)
- */
 
 // Corresponds to Messages sent over the Websockets
 // used to differentiate kinds of Messages. Acts as a Wrapper for the Event Types.

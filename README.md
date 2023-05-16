@@ -1,10 +1,10 @@
 # Websockets in go
-Proof of concept to get familiar with websockets in golang. Want to actually use them for something else spanning between Broser-JS -> GoServer <- C#-Application, so a small scale test like this went first.
+To get familiar with websockets in golang. Want to actually use them for something else spanning between Broser-JS -> GoServer <- C#-Application, so a small scale test like this went first.
 
-Goals:
-- Chatrooms, with a free chatroom selector
+Features:
+- Chatrooms, with a free chatroom/group selector.
 - Communication in the Rooms goes over the Server via websockets.
-- maybe test the SSL variant `wss vs ws` of Websockets. 
+- primitve login that happens in HTTP before any WebSocket connection is upgraded.
 
 ## info on websockets:
 - RFC for Websocket Protocol: https://www.rfc-editor.org/rfc/rfc6455.html#section-11.8
