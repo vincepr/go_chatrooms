@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"errors"
-	"fmt"
 	"sync"
 	"time"
 )
@@ -35,10 +34,8 @@ func NewManager(ctx context.Context) *Manager {
 
 // configures and adds all the handlers
 func (m *Manager) SetupEventHandlers() {
-	m.handlers[EventSendMessage] = func(e Event, c *Client) error {
-		fmt.Println(e)
-		return nil
-	}
+	m.handlers[EventSendMessage] = SendMessageHandler
+	m.handlers[EventChangeRoom] = ChatRoomHandler
 }
 
 func (m *Manager) routeEvent(event Event, c *Client) error {

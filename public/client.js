@@ -1,3 +1,9 @@
+/*
+*
+*   Setting globals up and connecting handlers
+*
+*/
+
 
 // initial selection for chat-room:
 var selectedChat = "general"
@@ -12,7 +18,9 @@ document.getElementById("login").addEventListener("submit", handleLogin);
 
 
 /*
+*
 *   Button/Submit Handlers:
+*
 */
 
 // handles the onSubmit for Room Selection
@@ -20,7 +28,14 @@ function handleRoomSelection(ev) {
     ev.preventDefault();
     let newChat = document.getElementById("chatroom");
     if (newChat != null && newChat.value != selectedChat){
-        console.log("DEBUG: changing to" + newChat.value)
+        selectedChat = newChat.value;
+        document.getElementById("chat-header").innerHTML = "Currently in room: "+selectedChat;
+        
+        let newRoomEvent = new ChangeChatRoomEvent(selectedChat);
+        sendEvent("change_room", newRoomEvent);
+        document.getElementById("chatmessages").innerHTML = "Changed to Room: "+selectedChat;
+        
+
     }
 }
 
@@ -29,7 +44,9 @@ function handleSendMessage(ev) {
     ev.preventDefault();
     let newMessage = document.getElementById("message");
     if (newMessage != null){
-        sendEvent("send_message", newMessage.value);
+        let userName = "Bob"    // TODO: hardcoded Username currently
+        let outEvent = new SendMessageEvent(newMessage.value, userName)
+        sendEvent("send_message", outEvent);
     }
 }
 
@@ -49,7 +66,6 @@ function handleLogin(ev) {
         if(response.ok) return response.json();
         else throw 'unauthorized';
     }).then((data) => {
-        console.log("data:" + data)
         connectWebsocket(data.otp);
     }).catch((err) => {alert(err)});
 }
@@ -67,7 +83,9 @@ function connectWebsocket(oneTimePassword) {
 
 
 /*
+*
 *   Handlers for the Websocket events:
+*
 */
 function setupWsHandlers() {
     // gets triggered after connection gets accepted by the server
@@ -82,8 +100,7 @@ function setupWsHandlers() {
     
     // gets triggered after receiving a message von the server
     wsConn.onmessage = (ev) => {
-        console.log(ev);
-        const eventData = JSON.parse(evt.data);
+        const eventData = JSON.parse(ev.data);
         const event = Object.assign(new Event, eventData);
         routeEvent(event);
         //console.log("message received: " + ev.data);
@@ -97,10 +114,13 @@ function setupWsHandlers() {
 
 
 /*
+*
 *   Event class is used to wrap all messages
 *   Go will be able to use the `same struct` to Deserialize it
+*
 */
 
+// Wrapper other Event Types get wrapped into. (into the payload)
 class Event {
     constructor(type, payload) {
         this.type = type;
@@ -108,23 +128,58 @@ class Event {
     }
 }
 
-function sendEvent(eventName, payload) {
-    const event = new Event(eventName, payload);
-    wsConn.send(JSON.stringify(event));
+// Message THIS Client sends to Server -> other Clients
+class SendMessageEvent {
+    constructor(message, from){
+        this.message = message;
+        this.from = from;
+    }
 }
 
+// Message of OTHER Client that gets forwarded trough Server to This Client.
+class NewMessageEvent {
+    constructor(message, from, sent){
+        this.message = message;
+        this.from = from;
+        this.sent = sent;
+    }
+}
 
-// RouteEvent is a proxy function that routes events to the correct Handler
+// Event to switch the active Chatroom this Client takes part in:
+class ChangeChatRoomEvent {
+    constructor(name) {
+        this.name = name;
+    }
+}
+
+// function to send a message-type Event
+// to the Server over Websocket -> Server (-> forwards to other Clients if needed)
+function sendEvent(eventName, payload) {
+    let newEvent = new Event(eventName, payload);
+    wsConn.send(JSON.stringify(newEvent));
+}
+
+// RouteEvent is a proxy function that routes incoming events to the correct Handler
 function routeEvent(ev) {
     if (ev.type === undefined) {
-        alert("no type field in the event");
+        alert("no type field was provided");
     }
     switch (ev.type) {
-        case "new_message":
-            console.log("new message");
+        case "send_message":
+            const incMessageEvent = Object.assign(new NewMessageEvent, ev.payload)
+            appendChatMessage(incMessageEvent)
             break;
         default:
             alert("unsupported message type");
             break;
     }
+}
+
+// We just append Messages to our Text Box
+function appendChatMessage(incMessageEvent) {
+    let date = new Date(incMessageEvent.sent);
+    let formattedMsg = `${date.toLocaleString()}: ${incMessageEvent.message}`
+    let $textarea = document.getElementById("chatmessages");
+    $textarea.innerHTML += "\n" + formattedMsg;
+    $textarea.scrollTop = $textarea.scrollHeight;
 }

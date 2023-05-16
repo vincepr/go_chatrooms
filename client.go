@@ -19,9 +19,10 @@ var (
 
 // each Client gets a Client struct once upgraded to a Websocket Connection (from HTTP)
 type Client struct {
-	conn    *websocket.Conn // the websocket connection
-	manager *Manager        // reference to the manager that handles it
-	egress  chan Event      // to avoid concurrent writes on the Websocket we use this since it blocks
+	conn     *websocket.Conn // the websocket connection
+	manager  *Manager        // reference to the manager that handles it
+	egress   chan Event      // to avoid concurrent writes on the Websocket we use this since it blocks
+	chatroom string          // identifier for the current active Chatrrom
 }
 
 func NewClient(conn *websocket.Conn, manager *Manager) *Client {
@@ -85,7 +86,6 @@ func (c *Client) writeMessages() {
 	}()
 
 	for {
-		log.Println("12")
 		select {
 		// handle next message in queue(channel egress)
 		case msg, ok := <-c.egress:
@@ -107,7 +107,7 @@ func (c *Client) writeMessages() {
 			log.Println("dbg: sent message sucessfully")
 		// time send next ping, checking if connection is still alive
 		case <-ticker.C:
-			log.Println("sending ping")
+			// log.Println("sending ping")
 			if err := c.conn.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
 				log.Println("no pong recieved in time: ", err)
 				return // got no pong back in time -> we close
@@ -118,7 +118,7 @@ func (c *Client) writeMessages() {
 
 // handle the received Pong Message Type from the client
 func (c *Client) pongHandler(pongMsg string) error {
-	log.Println("pong")
+	// log.Println("pong")
 	// setup next Ping:
 	return c.conn.SetReadDeadline(time.Now().Add(pongWait))
 }
